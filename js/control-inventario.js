@@ -197,6 +197,10 @@ function calcularValorParte(parte) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function calcularTotalInventario(listado) {
+    if (!Array.isArray(listado)) {
+        return NaN;
+    }
+
     let total = 0;
 
     for (let i = 0; i < listado.length; i++) {
@@ -205,7 +209,6 @@ function calcularTotalInventario(listado) {
     }
 
     return total;
-
 }
 
 
@@ -249,22 +252,21 @@ function registrarEntrada(idParte, cantidad) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function registrarSalida(idParte, cantidad) {
-
-    // La búsqueda de la parte en el arreglo ya está resuelta.
     let parte = partes.find(function (p) { return p.id === idParte; });
 
     if (!parte) {
         return false;
     }
 
-    if (cantidad > parte.cantidad) {
+    let nuevaCantidad = parte.cantidad - cantidad;
+
+    if (nuevaCantidad < 0) {
         return false;
     }
 
-    parte.cantidad = parte.cantidad - cantidad;
+    parte.cantidad = nuevaCantidad;
 
     return true;
-
 }
 
 
@@ -279,8 +281,6 @@ function registrarSalida(idParte, cantidad) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function calcularPorcentajeOcupacion(parte) {
-
-    // Evitar división por cero y valores inválidos
     if (!parte || typeof parte.cantidad !== 'number' || typeof parte.capacidad_maxima !== 'number' || parte.capacidad_maxima <= 0) {
         return NaN;
     }
@@ -307,9 +307,15 @@ function calcularPorcentajeOcupacion(parte) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function verificarStockMinimo(parte) {
+    if (!parte || typeof parte.cantidad !== 'number' || typeof parte.cantidad_minima !== 'number') {
+        return false;
+    }
 
-    return parte.cantidad <= parte.cantidad_minima;
+    if (parte.cantidad <= parte.cantidad_minima) {
+        return true;
+    }
 
+    return false;
 }
 
 
